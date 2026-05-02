@@ -48,6 +48,11 @@
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .controls select {
+    max-width: 140px;
+    text-overflow: ellipsis;
   }
   .controls button:hover { background: #f1f5f9; }
   .controls button.active {
@@ -362,9 +367,10 @@
     .header { padding: 20px 16px 16px; }
     .header h1 { font-size: 22px; }
     .progress-wrap { padding: 10px 16px 4px; }
-    .controls { padding: 12px 12px; gap: 6px; }
-    .controls button, .controls select { padding: 7px 12px; font-size: 12px; }
-    .controls input { width: 100%; order: 10; }
+    .controls { padding: 10px 8px; gap: 5px; }
+    .controls button, .controls select { padding: 6px 10px; font-size: 11px; }
+    .controls select { max-width: 110px; }
+    .controls input { width: 100%; order: 10; font-size: 12px; }
     .stats { font-size: 12px; }
     .card-container { padding: 20px 12px; min-height: 320px; }
     .card { height: 260px; }
@@ -390,6 +396,8 @@
 
   @media (max-width: 380px) {
     .header h1 { font-size: 19px; }
+    .controls select { max-width: 90px; }
+    .controls button, .controls select { padding: 5px 8px; font-size: 11px; }
     .card { height: 230px; }
     .card-greek { font-size: 26px; }
     .card-back .card-russian { font-size: 20px; }

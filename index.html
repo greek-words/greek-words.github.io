@@ -483,18 +483,14 @@ async function init() {
     return;
   }
 
-  initApp();
+  startApp();
 }
 
-function initApp() {
-// --- app code below was previously at top level ---
-
-let filtered = [...words];
+let filtered = [];
 let cardIndex = 0;
 let mode = 'cards';
 let quizScore = { correct: 0, total: 0 };
 let hideTranslation = true;
-
 // ===== SECURITY: sanitize HTML =====
 function esc(str) {
   const d = document.createElement('div');
@@ -529,22 +525,6 @@ function getStorageSize() {
   }
   return { used: total, ourApp };
 }
-
-// Load saved progress with validation
-try {
-  if (storageAvailable()) {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      // Validate: must be array of strings, max reasonable size
-      if (Array.isArray(parsed) && parsed.length <= 2000 && parsed.every(x => typeof x === 'string' && x.length < 100)) {
-        // Only keep words that actually exist in our word list
-        const validWords = new Set(words.map(w => w.gr));
-        learned = new Set(parsed.filter(w => validWords.has(w)));
-      }
-    }
-  }
-} catch { learned = new Set(); }
 
 function saveLearned() {
   if (!storageAvailable()) return;
@@ -686,16 +666,6 @@ function celebrate(count) {
     setTimeout(() => overlay.remove(), 500);
   }, 3000);
 }
-
-// ===== INIT CATEGORIES =====
-const cats = [...new Set(words.map(w => w.cat))].sort();
-const catSelect = document.getElementById('catFilter');
-cats.forEach(c => {
-  const opt = document.createElement('option');
-  opt.value = c;
-  opt.textContent = c;
-  catSelect.appendChild(opt);
-});
 
 function setMode(m) {
   mode = m;
@@ -859,11 +829,39 @@ function nextQuiz() {
   });
 }
 
-// ===== INIT =====
-showCard();
-updateStats();
-updateProgress();
-} // end initApp
+function startApp() {
+  filtered = [...words];
+  cardIndex = 0;
+
+  // Init categories
+  const cats = [...new Set(words.map(w => w.cat))].sort();
+  const catSelect = document.getElementById('catFilter');
+  catSelect.innerHTML = '<option value="all">Все темы</option>';
+  cats.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    catSelect.appendChild(opt);
+  });
+
+  // Load saved progress
+  try {
+    if (storageAvailable()) {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length <= 2000 && parsed.every(x => typeof x === 'string' && x.length < 100)) {
+          const validWords = new Set(words.map(w => w.gr));
+          learned = new Set(parsed.filter(w => validWords.has(w)));
+        }
+      }
+    }
+  } catch { learned = new Set(); }
+
+  showCard();
+  updateStats();
+  updateProgress();
+}
 
 init();
 </script>

@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'none';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="no-referrer">
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
 <title>Greek A2 Vocabulary</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1511,6 +1515,13 @@ let mode = 'cards';
 let quizScore = { correct: 0, total: 0 };
 let hideTranslation = true;
 
+// ===== SECURITY: sanitize HTML =====
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
 // ===== PROGRESS (localStorage with safety) =====
 const STORAGE_KEY = 'greek_a2_learned';
 let learned = new Set();
@@ -1539,11 +1550,19 @@ function getStorageSize() {
   return { used: total, ourApp };
 }
 
-// Load saved progress
+// Load saved progress with validation
 try {
   if (storageAvailable()) {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) learned = new Set(JSON.parse(saved));
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Validate: must be array of strings, max reasonable size
+      if (Array.isArray(parsed) && parsed.length <= 2000 && parsed.every(x => typeof x === 'string' && x.length < 100)) {
+        // Only keep words that actually exist in our word list
+        const validWords = new Set(words.map(w => w.gr));
+        learned = new Set(parsed.filter(w => validWords.has(w)));
+      }
+    }
   }
 } catch { learned = new Set(); }
 
@@ -1624,10 +1643,10 @@ function celebrate(count) {
   overlay.innerHTML = `
     <canvas id="confettiCanvas"></canvas>
     <div class="celeb-msg">
-      <div class="celeb-icon">${ms.icon}</div>
-      <div class="celeb-count">${count} слов</div>
-      <div class="celeb-text">${ms.text}</div>
-      <div class="celeb-greek">${ms.greek}</div>
+      <div class="celeb-icon">${esc(ms.icon)}</div>
+      <div class="celeb-count">${parseInt(count, 10)} слов</div>
+      <div class="celeb-text">${esc(ms.text)}</div>
+      <div class="celeb-greek">${esc(ms.greek)}</div>
     </div>
   `;
   document.body.appendChild(overlay);
@@ -1802,10 +1821,10 @@ function renderList() {
     const div = document.createElement('div');
     div.className = 'word-item' + (isL ? ' learned' : '');
     div.innerHTML = `
-      <span class="greek">${w.gr}</span>
-      <span class="translit">${w.tr}</span>
-      <span class="russian ${hideTranslation ? 'hidden' : ''}" data-i="${i}">${w.ru}</span>
-      <span class="cat">${w.cat}</span>
+      <span class="greek">${esc(w.gr)}</span>
+      <span class="translit">${esc(w.tr)}</span>
+      <span class="russian ${hideTranslation ? 'hidden' : ''}" data-i="${i}">${esc(w.ru)}</span>
+      <span class="cat">${esc(w.cat)}</span>
       <span class="learned-check">${isL ? '✓' : ''}</span>
     `;
     div.onclick = () => {

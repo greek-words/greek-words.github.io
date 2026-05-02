@@ -29,15 +29,24 @@
 
   .controls {
     display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 16px 24px;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    padding: 12px 24px;
     background: #fff;
     border-bottom: 1px solid #e2e8f0;
     position: sticky;
     top: 0;
     z-index: 10;
+  }
+  .controls-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    width: 100%;
+    max-width: 500px;
   }
   .controls button, .controls select {
     padding: 8px 16px;
@@ -48,11 +57,15 @@
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s;
-    flex-shrink: 0;
+    white-space: nowrap;
   }
   .controls select {
-    max-width: 140px;
-    text-overflow: ellipsis;
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+  .controls-row input {
+    flex: 1;
+    min-width: 0;
   }
   .controls button:hover { background: #f1f5f9; }
   .controls button.active {
@@ -367,10 +380,9 @@
     .header { padding: 20px 16px 16px; }
     .header h1 { font-size: 22px; }
     .progress-wrap { padding: 10px 16px 4px; }
-    .controls { padding: 10px 8px; gap: 5px; }
-    .controls button, .controls select { padding: 6px 10px; font-size: 11px; }
-    .controls select { max-width: 110px; }
-    .controls input { width: 100%; order: 10; font-size: 12px; }
+    .controls { padding: 8px 10px; gap: 6px; }
+    .controls-row { gap: 6px; }
+    .controls button, .controls select { padding: 6px 10px; font-size: 12px; }
     .stats { font-size: 12px; }
     .card-container { padding: 20px 12px; min-height: 320px; }
     .card { height: 260px; }
@@ -396,7 +408,6 @@
 
   @media (max-width: 380px) {
     .header h1 { font-size: 19px; }
-    .controls select { max-width: 90px; }
     .controls button, .controls select { padding: 5px 8px; font-size: 11px; }
     .card { height: 230px; }
     .card-greek { font-size: 26px; }
@@ -421,14 +432,18 @@
 </div>
 
 <div class="controls">
-  <button class="active" onclick="setMode('cards')" id="btn-cards">Карточки</button>
-  <button onclick="setMode('list')" id="btn-list">Список</button>
-  <button onclick="setMode('quiz')" id="btn-quiz">Тест</button>
-  <select id="catFilter" onchange="filterCategory()">
-    <option value="all">Все темы</option>
-  </select>
-  <input type="text" id="search" placeholder="Поиск..." oninput="filterSearch()">
-  <button onclick="shuffle()">Перемешать</button>
+  <div class="controls-row">
+    <button class="active" onclick="setMode('cards')" id="btn-cards">Карточки</button>
+    <button onclick="setMode('list')" id="btn-list">Список</button>
+    <button onclick="setMode('quiz')" id="btn-quiz">Тест</button>
+  </div>
+  <div class="controls-row">
+    <select id="catFilter" onchange="filterCategory()">
+      <option value="all">Все темы</option>
+    </select>
+    <input type="text" id="search" placeholder="Поиск..." oninput="filterSearch()">
+    <button onclick="shuffle()">Перемешать</button>
+  </div>
 </div>
 
 <div class="stats" id="stats"></div>
